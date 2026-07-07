@@ -11,7 +11,7 @@ public class ModMessages {
 
     public static final SimpleChannel INSTANCE =
             NetworkRegistry.newSimpleChannel(
-                    new ResourceLocation(ServerCompanion.MOD_ID, "main"),
+                    ResourceLocation.fromNamespaceAndPath(ServerCompanion.MOD_ID, "main"),
                     () -> PROTOCOL_VERSION,
                     PROTOCOL_VERSION::equals,
                     PROTOCOL_VERSION::equals
