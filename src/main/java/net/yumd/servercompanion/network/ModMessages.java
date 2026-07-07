@@ -4,6 +4,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.network.NetworkRegistry;
 import net.minecraftforge.network.simple.SimpleChannel;
 import net.yumd.servercompanion.ServerCompanion;
+import net.yumd.servercompanion.network.packet.HelloC2SPacket;
 
 public class ModMessages {
 
@@ -24,6 +25,14 @@ public class ModMessages {
     }
 
     public static void register() {
-
+        INSTANCE.messageBuilder(
+            HelloC2SPacket.class,
+            id(),
+            net.minecraftforge.network.NetworkDirection.PLAY_TO_SERVER
+        )
+        .encoder(HelloC2SPacket::encode)
+        .decoder(HelloC2SPacket::new)
+        .consumerMainThread(HelloC2SPacket::handle)
+        .add();
     }
 }
