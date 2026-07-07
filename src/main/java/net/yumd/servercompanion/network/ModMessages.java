@@ -14,8 +14,8 @@ public class ModMessages {
             NetworkRegistry.newSimpleChannel(
                     ResourceLocation.fromNamespaceAndPath(ServerCompanion.MOD_ID, "main"),
                     () -> PROTOCOL_VERSION,
-                    PROTOCOL_VERSION::equals,
-                    PROTOCOL_VERSION::equals
+                    clientAcceptedVersions -> true,
+                    serverAcceptedVersions -> true
             );
 
     private static int packetId = 0;
