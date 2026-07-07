@@ -1,7 +1,7 @@
 package net.yumd.servercompanion.client;
 
 import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.event.entity.player.PlayerEvent;
+import net.minecraftforge.client.event.ClientPlayerNetworkEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.yumd.servercompanion.ServerCompanion;
@@ -15,7 +15,10 @@ import net.yumd.servercompanion.network.packet.HelloC2SPacket;
 public class ClientEvents {
 
     @SubscribeEvent
-    public static void onJoinServer(PlayerEvent.PlayerLoggedInEvent event) {
+    public static void onLoggingIn(ClientPlayerNetworkEvent.LoggingIn event) {
+
+        System.out.println("ServerCompanion sending hello packet!");
+
         ModMessages.INSTANCE.sendToServer(
                 new HelloC2SPacket()
         );
