@@ -2,7 +2,9 @@ package net.yumd.servercompanion.network.packet;
 
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraftforge.network.NetworkEvent;
+
 import net.yumd.servercompanion.ServerCompanion;
+import net.yumd.servercompanion.server.VerificationManager;
 
 import java.util.function.Supplier;
 
@@ -33,6 +35,8 @@ public class HelloC2SPacket {
                         "Received hello from {}",
                         sender.getName().getString()
                 );
+
+                VerificationManager.verify(sender.getUUID());
             } else {
                 System.out.println("ServerCompanion received packet but sender was null");
             }
