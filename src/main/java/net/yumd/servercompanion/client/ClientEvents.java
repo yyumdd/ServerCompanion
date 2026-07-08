@@ -20,7 +20,7 @@ public class ClientEvents {
         System.out.println("ServerCompanion sending hello packet!");
 
         ModMessages.INSTANCE.sendToServer(
-                new HelloC2SPacket("0.1-1.20.1")
+                new HelloC2SPacket(ServerCompanion.VERSION)
         );
     }
 }

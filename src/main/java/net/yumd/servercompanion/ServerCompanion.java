@@ -18,6 +18,8 @@ import net.yumd.servercompanion.network.ModMessages;
 // The value here should match an entry in the META-INF/mods.toml file
 @Mod(ServerCompanion.MOD_ID)
 public class ServerCompanion {
+
+    public static final String VERSION = "0.1-1.20.1";
     // Define mod id in a common place for everything to reference
     public static final String MOD_ID = "servercompanion";
     // Directly reference a slf4j logger
