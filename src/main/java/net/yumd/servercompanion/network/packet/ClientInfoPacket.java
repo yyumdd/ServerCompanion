@@ -10,16 +10,20 @@ import java.util.function.Supplier;
 import java.util.List;
 import java.util.ArrayList;
 
-public class HelloC2SPacket {
+public class ClientInfoPacket {
     private final String version;
     private final List<String> mods;
+    private final List<String> resourcePacks;
 
-    public HelloC2SPacket(String version, List<String> mods) {
+    public ClientInfoPacket(String version, List<String> mods, List<String> resourcePacks) {
         this.version = version;
         this.mods = mods;
+        this.resourcePacks = resourcePacks;
     }
 
-    public HelloC2SPacket(FriendlyByteBuf buffer) {
+    public ClientInfoPacket(FriendlyByteBuf buffer) {
+
+        ServerCompanion.LOGGER.info("Decoding ClientInfoPacket");
 
         version = buffer.readUtf();
 
@@ -30,6 +34,14 @@ public class HelloC2SPacket {
         for (int i = 0; i < modCount; i++) {
             mods.add(buffer.readUtf());
         }
+
+        int resourcePackCount = buffer.readInt();
+
+        resourcePacks = new ArrayList<>();
+
+        for (int i = 0; i < resourcePackCount; i++) {
+            resourcePacks.add(buffer.readUtf());
+        }
     }
 
     public void encode(FriendlyByteBuf buffer) {
@@ -38,9 +50,15 @@ public class HelloC2SPacket {
         for (var mod : mods) {
             buffer.writeUtf(mod);
         }
+        buffer.writeInt(resourcePacks.size());
+        for (var resourcePack : resourcePacks) {
+            buffer.writeUtf(resourcePack);
+        }
     }
 
     public boolean handle(Supplier<NetworkEvent.Context> supplier) {
+
+        ServerCompanion.LOGGER.info("ClientInfoPacket received!");
 
         NetworkEvent.Context context = supplier.get();
 
@@ -50,7 +68,7 @@ public class HelloC2SPacket {
 
             if (sender != null) {
                 ServerCompanion.LOGGER.info(
-                        "Received hello from {}",
+                        "Received client info from {}",
                         sender.getName().getString()
                 );
                 ServerCompanion.LOGGER.info(
@@ -60,6 +78,10 @@ public class HelloC2SPacket {
                 ServerCompanion.LOGGER.info(
                         "Client mods: {}",
                         mods
+                );
+                ServerCompanion.LOGGER.info(
+                        "Client resource packs: {}",
+                        resourcePacks
                 );
                 VerificationManager.verify(sender.getUUID());
             } else {

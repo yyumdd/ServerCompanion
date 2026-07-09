@@ -35,6 +35,7 @@ public class ServerCompanion {
     }
 
     private void commonSetup(final FMLCommonSetupEvent event) {
+        ServerCompanion.LOGGER.info("Registering network packets");
         ModMessages.register();
     }
 

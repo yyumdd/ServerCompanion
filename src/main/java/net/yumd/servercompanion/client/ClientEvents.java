@@ -6,10 +6,11 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.yumd.servercompanion.ServerCompanion;
 import net.yumd.servercompanion.network.ModMessages;
-import net.yumd.servercompanion.network.packet.HelloC2SPacket;
+import net.yumd.servercompanion.network.packet.ClientInfoPacket;
 import net.minecraftforge.fml.ModList;
 import java.util.ArrayList;
 import java.util.List;
+import net.minecraft.client.Minecraft;
 
 @Mod.EventBusSubscriber(
         modid = ServerCompanion.MOD_ID,
@@ -28,16 +29,40 @@ public class ClientEvents {
         return modList;
     }
 
+    private static List<String> getInstalledResourcePacks() {
+
+        var packs = Minecraft.getInstance()
+                .getResourcePackRepository()
+                .getAvailablePacks();
+
+        var resourcePacks = new ArrayList<String>();
+
+        for (var pack : packs) {
+            resourcePacks.add(pack.getTitle().getString());
+        }
+
+        return resourcePacks;
+    }
+
     @SubscribeEvent
     public static void onLoggingIn(ClientPlayerNetworkEvent.LoggingIn event) {
 
         System.out.println("ServerCompanion sending hello packet!");
+
         var mods = getInstalledMods();
+        var resourcePacks = getInstalledResourcePacks();
 
         System.out.println(mods);
+        System.out.println(resourcePacks);
+
+        System.out.println("Sending ClientInfoPacket");
 
         ModMessages.INSTANCE.sendToServer(
-                new HelloC2SPacket(ServerCompanion.VERSION, mods)
+                new ClientInfoPacket(
+                        ServerCompanion.VERSION,
+                        mods,
+                        resourcePacks
+                )
         );
     }
 }
