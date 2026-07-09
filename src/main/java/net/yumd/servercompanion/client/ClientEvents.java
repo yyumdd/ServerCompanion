@@ -6,7 +6,8 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.yumd.servercompanion.ServerCompanion;
 import net.yumd.servercompanion.network.ModMessages;
-import net.yumd.servercompanion.network.packet.ClientInfoPacket;
+import net.yumd.servercompanion.network.c2s.ClientHelloC2SPacket;
+import net.yumd.servercompanion.network.c2s.ClientInfoC2SPacket;
 import net.minecraftforge.fml.ModList;
 import java.util.ArrayList;
 import java.util.List;
@@ -58,11 +59,7 @@ public class ClientEvents {
         System.out.println("Sending ClientInfoPacket");
 
         ModMessages.INSTANCE.sendToServer(
-                new ClientInfoPacket(
-                        ServerCompanion.VERSION,
-                        mods,
-                        resourcePacks
-                )
+                new ClientHelloC2SPacket(ServerCompanion.VERSION)
         );
     }
 }

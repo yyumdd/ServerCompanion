@@ -1,4 +1,4 @@
-package net.yumd.servercompanion.network.packet;
+package net.yumd.servercompanion.network.c2s;
 
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraftforge.network.NetworkEvent;
@@ -10,20 +10,20 @@ import java.util.function.Supplier;
 import java.util.List;
 import java.util.ArrayList;
 
-public class ClientInfoPacket {
+public class ClientInfoC2SPacket {
     private final String version;
     private final List<String> mods;
     private final List<String> resourcePacks;
 
-    public ClientInfoPacket(String version, List<String> mods, List<String> resourcePacks) {
+    public ClientInfoC2SPacket(String version, List<String> mods, List<String> resourcePacks) {
         this.version = version;
         this.mods = mods;
         this.resourcePacks = resourcePacks;
     }
 
-    public ClientInfoPacket(FriendlyByteBuf buffer) {
+    public ClientInfoC2SPacket(FriendlyByteBuf buffer) {
 
-        ServerCompanion.LOGGER.info("Decoding ClientInfoPacket");
+        ServerCompanion.LOGGER.info("Decoding ClientInfoC2SPacket");
 
         version = buffer.readUtf();
 
@@ -58,7 +58,7 @@ public class ClientInfoPacket {
 
     public boolean handle(Supplier<NetworkEvent.Context> supplier) {
 
-        ServerCompanion.LOGGER.info("ClientInfoPacket received!");
+        ServerCompanion.LOGGER.info("ClientInfoC2SPacket received!");
 
         NetworkEvent.Context context = supplier.get();
 
