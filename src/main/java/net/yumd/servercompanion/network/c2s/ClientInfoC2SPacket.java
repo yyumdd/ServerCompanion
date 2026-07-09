@@ -4,6 +4,8 @@ import net.minecraft.network.FriendlyByteBuf;
 import net.minecraftforge.network.NetworkEvent;
 
 import net.yumd.servercompanion.ServerCompanion;
+import net.yumd.servercompanion.server.ClientReport;
+import net.yumd.servercompanion.server.ClientReportManager;
 import net.yumd.servercompanion.server.VerificationManager;
 
 import java.util.function.Supplier;
@@ -83,7 +85,25 @@ public class ClientInfoC2SPacket {
                         "Client resource packs: {}",
                         resourcePacks
                 );
+                ClientReport report = new ClientReport(
+                        sender.getUUID(),
+                        sender.getName().getString(),
+                        version,
+                        mods,
+                        resourcePacks
+                );
+
+                if (sender.getServer() != null) {
+                    ClientReportManager.saveReport(
+                            report,
+                            sender.getServer()
+                    );
+                }
                 VerificationManager.verify(sender.getUUID());
+                ServerCompanion.LOGGER.info(
+                        "Saved client report for {}",
+                        sender.getName().getString()
+                );
             } else {
                 System.out.println("ServerCompanion received packet but sender was null");
             }
