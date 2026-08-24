@@ -59,9 +59,9 @@ public final class DiscordWebhookService {
         String modsField = unlistedMods.isEmpty()
                 ? "None"
                 : truncate(unlistedMods.stream()
-                        .map(m -> m.id() + " (" + m.version() + ")")
-                        .reduce((a, b) -> a + "\\n" + b)
-                        .orElse(""), FIELD_VALUE_LIMIT);
+                .map(m -> m.id() + " (" + m.version() + ")")
+                .reduce((a, b) -> a + "\n" + b)
+                .orElse(""), FIELD_VALUE_LIMIT);
 
         String packsField = localPacks.isEmpty() ? "None" : truncate(String.join(", ", localPacks), FIELD_VALUE_LIMIT);
 

@@ -6,10 +6,15 @@ import java.util.stream.Collectors;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.context.CommandContext;
 
+import net.minecraft.ChatFormatting;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.arguments.EntityArgument;
+import net.minecraft.network.chat.ClickEvent;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.HoverEvent;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.network.chat.Style;
 import net.minecraft.server.level.ServerPlayer;
 import net.neoforged.fml.ModList;
 import net.yumd.servercompanion.Config;
@@ -49,11 +54,19 @@ public final class ServerCompanionCommand {
         String arrayLiteral = ids.stream()
                 .map(id -> "\"" + id + "\"")
                 .collect(Collectors.joining(", "));
+        String line = "modWhitelist = [" + arrayLiteral + "]";
 
-        ctx.getSource().sendSuccess(() -> Component.literal("modWhitelist = [" + arrayLiteral + "]"), false);
+        MutableComponent clickToCopy = Component.literal(line)
+                .setStyle(Style.EMPTY
+                        .withColor(ChatFormatting.AQUA)
+                        .withClickEvent(new ClickEvent(ClickEvent.Action.COPY_TO_CLIPBOARD, line))
+                        .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT,
+                                Component.literal("Click to copy to clipboard"))));
+
+        ctx.getSource().sendSuccess(() -> clickToCopy, false);
         ctx.getSource().sendSuccess(() -> Component.literal(
-                "Paste the line above into config/servercompanion-common.toml (replacing the existing "
-                        + "modWhitelist line), then run /reload or restart the server."), false);
+                "^ click that line to copy it, then paste into config/servercompanion-common.toml "
+                        + "(replacing the existing modWhitelist line), then /reload or restart the server."), false);
         return 1;
     }
 }

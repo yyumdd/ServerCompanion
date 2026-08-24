@@ -45,17 +45,22 @@ public final class ClientReportHandler implements IPayloadHandler<ReportRequestP
         PacketDistributor.sendToServer(response);
     }
 
+    // Packs known to be non-user-added but which still carry PackSource.DEFAULT (so the source
+    // check alone doesn't exclude them). Confirmed via testing: "mod_resources" is NeoForge's
+    // combined pack aggregating every mod's built-in resources.
+    private static final java.util.Set<String> NON_USER_PACK_IDS = java.util.Set.of(
+            "vanilla", "mod_resources", "programmer_art", "high_contrast");
+
     // Only packs with PackSource.DEFAULT are included -- that's the source used for ordinary
-    // packs a player dropped into their resourcepacks folder, as opposed to the base game pack,
-    // mod-provided packs, or the server's own pushed pack (all of which carry other sources and
-    // are excluded so the report only shows what the player actually added).
-    // NOTE: verify this in-game against a test resourcepacks folder before relying on it --
-    // I couldn't compile/run this against the real client to double-check the exact filtering.
+    // packs a player dropped into their resourcepacks folder, as opposed to mod-provided packs
+    // or the server's own pushed pack (which carry other sources). "mod_resources" is an
+    // additional known exception filtered out explicitly above.
     private static List<String> collectLocalResourcePacks() {
         try {
             return Minecraft.getInstance().getResourcePackRepository().getSelectedPacks().stream()
                     .filter(pack -> pack.getPackSource() == PackSource.DEFAULT)
                     .map(Pack::getId)
+                    .filter(id -> !NON_USER_PACK_IDS.contains(id))
                     .toList();
         } catch (Exception e) {
             ServerCompanion.LOGGER.warn("ServerCompanion: failed to read local resource packs", e);
