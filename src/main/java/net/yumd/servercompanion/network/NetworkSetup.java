@@ -5,14 +5,14 @@ import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
 import net.neoforged.neoforge.network.registration.PayloadRegistrar;
 import net.yumd.servercompanion.ServerCompanion;
+import net.yumd.servercompanion.client.ClientReportHandler;
 import net.yumd.servercompanion.report.ServerReportHandler;
 
 /**
- * Registers the server-bound (C2S) report payload. Lives in common code (loads on both sides)
- * but the handler it points at never references client-only classes, so it's safe here.
- * The client-bound (S2C) request payload is registered separately from ServerCompanionClient,
- * which is annotated Dist.CLIENT -- keeping the two apart avoids ever loading a class that
- * touches Minecraft.getInstance() on a dedicated server.
+ * Registers both payload directions from common code. Both sides need to know about both
+ * channels for the handshake to succeed, even though each handler only ever actually runs on
+ * the side that receives that packet (ClientReportHandler is never invoked on the server -- the
+ * server only sends ReportRequestPayload, it never receives it).
  */
 @EventBusSubscriber(modid = ServerCompanion.MOD_ID)
 public final class NetworkSetup {
@@ -23,5 +23,6 @@ public final class NetworkSetup {
     static void onRegisterPayloads(RegisterPayloadHandlersEvent event) {
         PayloadRegistrar registrar = event.registrar("1");
         registrar.playToServer(ReportResponsePayload.TYPE, ReportResponsePayload.STREAM_CODEC, ServerReportHandler.INSTANCE);
+        registrar.playToClient(ReportRequestPayload.TYPE, ReportRequestPayload.STREAM_CODEC, ClientReportHandler.INSTANCE);
     }
 }
