@@ -1,0 +1,26 @@
+#Mod IDs that are expected/part of the modpack. Mods a player has that are NOT
+#in this list will be flagged in reports. Generate this list with the in-game
+#command: /servercompanion whitelist dump (run on the server, once your pack
+#is finalized), then paste the printed array here.
+modWhitelist = []
+#Discord webhook URL that reports are posted to. Leave empty to disable Discord posting.
+discordWebhookUrl = ""
+#Shared secret used to sign client reports (HMAC-SHA256). Must be identical in
+#the client's and server's config for signatures to verify. This is a lightweight
+#check: it catches accidental corruption, replay of stale reports, and casual
+#tampering, but it is NOT a strong security boundary -- a sufficiently motivated
+#person can extract this from the client mod jar. Change this from the default
+#before distributing your modpack.
+hmacSecret = "CHANGE-ME-BEFORE-DISTRIBUTING"
+#Reports with a timestamp older than this (clock skew / replay protection) are flagged as unverified.
+# Default: 30
+# Range: 5 ~ 300
+maxResponseAgeSeconds = 30
+#How long the server waits for a client to respond to a report request before giving up.
+# Default: 5
+# Range: 1 ~ 60
+responseTimeoutSeconds = 5
+#Permission level required to run /servercompanion commands. 2 = ops (default), 4 = server owner only.
+# Default: 2
+# Range: 0 ~ 4
+commandPermissionLevel = 2
