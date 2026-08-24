@@ -26,12 +26,57 @@ public final class DiscordWebhookService {
     }
 
     public static void postReport(String playerName, List<ModEntry> unlistedMods, List<String> localPacks, boolean verified) {
+        String modsField = unlistedMods.isEmpty()
+                ? "None"
+                : truncate(unlistedMods.stream()
+                        .map(m -> m.id() + " (" + m.version() + ")")
+                        .reduce((a, b) -> a + "\n" + b)
+                        .orElse(""), FIELD_VALUE_LIMIT);
+
+        String packsField = localPacks.isEmpty() ? "None" : truncate(String.join(", ", localPacks), FIELD_VALUE_LIMIT);
+
+        int color = verified ? 0x2ECC71 : 0xE67E22; // green = verified, orange = unverified
+
+        String json = "{"
+                + "\"embeds\":[{"
+                + "\"title\":\"ServerCompanion report: " + escape(playerName) + "\","
+                + "\"color\":" + color + ","
+                + "\"fields\":["
+                + "{\"name\":\"Unlisted mods\",\"value\":\"" + escape(modsField) + "\"},"
+                + "{\"name\":\"Local resource packs\",\"value\":\"" + escape(packsField) + "\"},"
+                + "{\"name\":\"Integrity\",\"value\":\"" + (verified ? "Verified" : "UNVERIFIED") + "\"}"
+                + "],"
+                + "\"timestamp\":\"" + Instant.now() + "\""
+                + "}]"
+                + "}";
+
+        postJson(json);
+    }
+
+    public static void postResourcePackChange(String playerName, List<String> added, List<String> removed) {
+        String addedField = added.isEmpty() ? "None" : truncate(String.join("\n", added), FIELD_VALUE_LIMIT);
+        String removedField = removed.isEmpty() ? "None" : truncate(String.join("\n", removed), FIELD_VALUE_LIMIT);
+
+        String json = "{"
+                + "\"embeds\":[{"
+                + "\"title\":\"Resource pack change: " + escape(playerName) + "\","
+                + "\"color\":3447003,"
+                + "\"fields\":["
+                + "{\"name\":\"Added\",\"value\":\"" + escape(addedField) + "\"},"
+                + "{\"name\":\"Removed\",\"value\":\"" + escape(removedField) + "\"}"
+                + "],"
+                + "\"timestamp\":\"" + Instant.now() + "\""
+                + "}]"
+                + "}";
+
+        postJson(json);
+    }
+
+    private static void postJson(String json) {
         String url = Config.DISCORD_WEBHOOK_URL.get();
         if (url == null || url.isBlank()) {
             return;
         }
-
-        String json = buildEmbedJson(playerName, unlistedMods, localPacks, verified);
 
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(url))
@@ -53,32 +98,6 @@ public final class DiscordWebhookService {
                 ServerCompanion.LOGGER.warn("ServerCompanion: failed to post to Discord webhook", e);
             }
         });
-    }
-
-    private static String buildEmbedJson(String playerName, List<ModEntry> unlistedMods, List<String> localPacks, boolean verified) {
-        String modsField = unlistedMods.isEmpty()
-                ? "None"
-                : truncate(unlistedMods.stream()
-                .map(m -> m.id() + " (" + m.version() + ")")
-                .reduce((a, b) -> a + "\n" + b)
-                .orElse(""), FIELD_VALUE_LIMIT);
-
-        String packsField = localPacks.isEmpty() ? "None" : truncate(String.join(", ", localPacks), FIELD_VALUE_LIMIT);
-
-        int color = verified ? 0x2ECC71 : 0xE67E22; // green = verified, orange = unverified
-
-        return "{"
-                + "\"embeds\":[{"
-                + "\"title\":\"ServerCompanion report: " + escape(playerName) + "\","
-                + "\"color\":" + color + ","
-                + "\"fields\":["
-                + "{\"name\":\"Unlisted mods\",\"value\":\"" + escape(modsField) + "\"},"
-                + "{\"name\":\"Local resource packs\",\"value\":\"" + escape(packsField) + "\"},"
-                + "{\"name\":\"Integrity\",\"value\":\"" + (verified ? "Verified" : "UNVERIFIED") + "\"}"
-                + "],"
-                + "\"timestamp\":\"" + Instant.now() + "\""
-                + "}]"
-                + "}";
     }
 
     private static String truncate(String s, int limit) {

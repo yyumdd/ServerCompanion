@@ -41,6 +41,15 @@ public final class HmacUtil {
         return sb.toString();
     }
 
+    public static String canonicalResourcePackUpdate(long timestamp, List<String> localResourcePacks) {
+        StringBuilder sb = new StringBuilder();
+        sb.append(timestamp).append('|');
+        for (String pack : localResourcePacks) {
+            sb.append(pack).append(';');
+        }
+        return sb.toString();
+    }
+
     public static String sign(String secret, String canonicalPayload) {
         try {
             Mac mac = Mac.getInstance(ALGORITHM);

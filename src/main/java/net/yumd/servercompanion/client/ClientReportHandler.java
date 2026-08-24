@@ -7,9 +7,6 @@ import java.security.MessageDigest;
 import java.util.HexFormat;
 import java.util.List;
 
-import net.minecraft.client.Minecraft;
-import net.minecraft.server.packs.repository.Pack;
-import net.minecraft.server.packs.repository.PackSource;
 import net.neoforged.fml.ModList;
 import net.neoforged.neoforge.network.PacketDistributor;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
@@ -33,7 +30,7 @@ public final class ClientReportHandler implements IPayloadHandler<ReportRequestP
                 .map(mod -> new ModEntry(mod.getModId(), mod.getDisplayName(), mod.getVersion().toString()))
                 .toList();
 
-        List<String> localPacks = collectLocalResourcePacks();
+        List<String> localPacks = LocalResourcePacks.collect();
         String selfJarHash = computeSelfJarHash();
 
         String canonical = HmacUtil.canonicalPayload(request.nonce(), request.timestamp(), mods, localPacks, selfJarHash);
@@ -43,29 +40,6 @@ public final class ClientReportHandler implements IPayloadHandler<ReportRequestP
                 request.nonce(), request.timestamp(), mods, localPacks, selfJarHash, signature);
 
         PacketDistributor.sendToServer(response);
-    }
-
-    // Packs known to be non-user-added but which still carry PackSource.DEFAULT (so the source
-    // check alone doesn't exclude them). Confirmed via testing: "mod_resources" is NeoForge's
-    // combined pack aggregating every mod's built-in resources.
-    private static final java.util.Set<String> NON_USER_PACK_IDS = java.util.Set.of(
-            "vanilla", "mod_resources", "programmer_art", "high_contrast");
-
-    // Only packs with PackSource.DEFAULT are included -- that's the source used for ordinary
-    // packs a player dropped into their resourcepacks folder, as opposed to mod-provided packs
-    // or the server's own pushed pack (which carry other sources). "mod_resources" is an
-    // additional known exception filtered out explicitly above.
-    private static List<String> collectLocalResourcePacks() {
-        try {
-            return Minecraft.getInstance().getResourcePackRepository().getSelectedPacks().stream()
-                    .filter(pack -> pack.getPackSource() == PackSource.DEFAULT)
-                    .map(Pack::getId)
-                    .filter(id -> !NON_USER_PACK_IDS.contains(id))
-                    .toList();
-        } catch (Exception e) {
-            ServerCompanion.LOGGER.warn("ServerCompanion: failed to read local resource packs", e);
-            return List.of();
-        }
     }
 
     private static String computeSelfJarHash() {

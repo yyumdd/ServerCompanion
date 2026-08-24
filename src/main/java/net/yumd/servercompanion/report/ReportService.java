@@ -63,6 +63,10 @@ public final class ReportService {
                 .sorted(Comparator.comparing(ModEntry::id))
                 .toList();
 
+        // Seed the resource pack change tracker with this report's list, so the next mid-session
+        // change (from ResourcePackWatcher) diffs against an accurate baseline instead of nothing.
+        ResourcePackStateTracker.setBaseline(pending.targetPlayerId(), payload.localResourcePacks());
+
         if (pending.source() != null) {
             String summary = buildChatSummary(pending.targetPlayerName(), unlisted, payload.localResourcePacks(), verified);
             pending.source().sendSuccess(() -> Component.literal(summary), false);

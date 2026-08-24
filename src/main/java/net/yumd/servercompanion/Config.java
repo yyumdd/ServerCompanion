@@ -12,12 +12,15 @@ import net.neoforged.neoforge.common.ModConfigSpec;
  *  - The HMAC secret DOES need to match on both sides. Since this mod is meant for a private
  *    modpack, the expected setup is: bundle a pre-filled config/servercompanion-common.toml
  *    (with the same hmacSecret) inside the modpack you distribute to your friends, so nobody
- *    has to manually edit anything.
+ *    has to manually edit anything. See README notes on this when generated.
  */
 public class Config {
     private static final ModConfigSpec.Builder BUILDER = new ModConfigSpec.Builder();
 
     // ---- Mod whitelist ----
+    // Mod IDs considered "expected" (part of the modpack). Anything a player has that is NOT in
+    // this list gets called out in reports. Populate this with `/servercompanion whitelist dump`
+    // run on the server, which prints a ready-to-paste array based on the server's own mod list.
     public static final ModConfigSpec.ConfigValue<List<? extends String>> MOD_WHITELIST = BUILDER
             .comment(
                     "Mod IDs that are expected/part of the modpack. Mods a player has that are NOT",
@@ -54,6 +57,11 @@ public class Config {
     public static final ModConfigSpec.IntValue COMMAND_PERMISSION_LEVEL = BUILDER
             .comment("Permission level required to run /servercompanion commands. 2 = ops (default), 4 = server owner only.")
             .defineInRange("commandPermissionLevel", 2, 0, 4);
+
+    // ---- Resource pack change alerts ----
+    public static final ModConfigSpec.BooleanValue RESOURCE_PACK_CHANGE_ALERTS = BUILDER
+            .comment("Post a Discord alert whenever an online player adds or removes a local resource pack mid-session.")
+            .define("resourcePackChangeAlerts", true);
 
     static final ModConfigSpec SPEC = BUILDER.build();
 }

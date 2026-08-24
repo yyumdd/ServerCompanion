@@ -16,6 +16,7 @@ import net.neoforged.neoforge.event.RegisterCommandsEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.yumd.servercompanion.command.ServerCompanionCommand;
 import net.yumd.servercompanion.report.ReportService;
+import net.yumd.servercompanion.report.ResourcePackStateTracker;
 
 // The value here should match an entry in the META-INF/neoforge.mods.toml file
 @Mod(ServerCompanion.MOD_ID)
@@ -50,6 +51,15 @@ public class ServerCompanion {
     public void onPlayerLoggedIn(PlayerEvent.PlayerLoggedInEvent event) {
         if (event.getEntity() instanceof ServerPlayer player) {
             ReportService.requestReport(player, null);
+        }
+    }
+
+    // Clears the resource pack change baseline so a later session never diffs against stale
+    // state from an earlier one.
+    @SubscribeEvent
+    public void onPlayerLoggedOut(PlayerEvent.PlayerLoggedOutEvent event) {
+        if (event.getEntity() instanceof ServerPlayer player) {
+            ResourcePackStateTracker.clear(player.getUUID());
         }
     }
 }
