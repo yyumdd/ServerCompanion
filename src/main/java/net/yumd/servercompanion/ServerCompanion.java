@@ -17,7 +17,7 @@ import net.neoforged.neoforge.event.server.ServerStartingEvent;
 // The value here should match an entry in the META-INF/neoforge.mods.toml file
 @Mod(ServerCompanion.MOD_ID)
 public class ServerCompanion {
-    public static final String MOD_ID = "severcompanion";
+    public static final String MOD_ID = "servercompanion";
     public static final Logger LOGGER = LogUtils.getLogger();
 
     // The constructor for the mod class is the first code that is run when your mod is loaded.
